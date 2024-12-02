@@ -61,7 +61,7 @@ find_package(FFMPEG REQUIRED)
 find_package(LIBUSB REQUIRED)
 
 set(DJI_OSAL_PATH ${PSDK_PATH}/samples/sample_c++/platform/linux/common/osal)
-set(DJI_HAL_PATH ${PSDK_PATH}/samples/sample_c++/platform/linux/manifold2/hal)
+set(DJI_HAL_PATH ${PSDK_PATH}/samples/sample_c++/platform/linux/nvidia_jetson/hal)
 set(DJI_STREAMING_PATH ${PSDK_PATH}/samples/sample_c++/module_sample/liveview)
 set(DJI_UTILS_PATH ${PSDK_PATH}/samples/sample_c/module_sample)
 set(DJI_HMS_RETURN_CODES_PATH ${PSDK_PATH}/samples/sample_c/module_sample/hms/data)

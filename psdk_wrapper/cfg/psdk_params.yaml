@@ -1,11 +1,11 @@
 /**:
     ros__parameters:
-      app_name: "YourPSDK"
-      app_id: "YourID"
-      app_key: "YourAppKey"
-      app_license: "YourAppLicense"
-      developer_account: "YourDeveloperAccount"
-      baudrate: "921600"
+      app_name: "OrinNano"
+      app_id: "152189"
+      app_key: "92e9288a3ef6c253f69d64d614b2530"
+      app_license: "BIR7AZbpmaL4VCgs1BQB05CCBOUyzMqTyO8oIJD/GuHXPHff1V10bKdiVy2fPCSvulECuDFiBO2dDwNsWFJKPM4YD5zNx9ZgZsfrhVLRbDsyEuR/UHErgQ71cnDDCXeI3qg35E6Ppa80HojlIIDNkXeB94DhBioQ9tuDyekxzTw4TVGrh3UkSEpKlf5vxMupYu2MjWdR+/Lt+K8jE8odBSMHqtps7LsQHUBQ73s+mKPk4AXp8qvMD4onW4iheM8Bt+rv5XVyfnGfuuPcqA45iyYuyxXbLi8/ZREdh816pcaPbJE8UPiCGs9yZj9DcPVoffHGAMhr/0RjlXMRoB/ezA=="
+      developer_account: "db72702@gmail.com"
+      baudrate: "460800"
 
       num_of_initialization_retries: 3
 

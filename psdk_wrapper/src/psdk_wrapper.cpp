@@ -19,6 +19,10 @@
 
 #include "psdk_wrapper/psdk_wrapper.hpp"
 
+#define USER_UTIL_UNUSED(x)                                 ((x) = (x))
+#define USER_UTIL_MIN(a, b)                                 (((a) < (b)) ? (a) : (b))
+#define USER_UTIL_MAX(a, b)                                 (((a) > (b)) ? (a) : (b))
+
 std::shared_ptr<psdk_ros2::TelemetryModule> psdk_ros2::global_telemetry_ptr_;
 std::shared_ptr<psdk_ros2::CameraModule> psdk_ros2::global_camera_ptr_;
 std::shared_ptr<psdk_ros2::LiveviewModule> psdk_ros2::global_liveview_ptr_;
@@ -361,7 +365,7 @@ PSDKWrapper::set_environment()
   if (linkConfig.type == DJI_USER_LINK_CONFIG_USE_UART_AND_USB_BULK_DEVICE)
   {
     RCLCPP_INFO(get_logger(), "Using DJI_USE_UART_USB_BULK_DEVICE");
-    T_DjiHalUsbBulkHandler usb_bulk_handler;
+    T_DjiHalUsbBulkHandler usb_bulk_handler = {0};
     usb_bulk_handler.UsbBulkInit = HalUsbBulk_Init;
     usb_bulk_handler.UsbBulkDeInit = HalUsbBulk_DeInit;
     usb_bulk_handler.UsbBulkWriteData = HalUsbBulk_WriteData;
@@ -379,7 +383,7 @@ PSDKWrapper::set_environment()
   else if (linkConfig.type == DJI_USER_LINK_CONFIG_USE_UART_AND_NETWORK_DEVICE)
   {
     RCLCPP_INFO(get_logger(), "Using DJI_USE_UART_AND_NETWORK_DEVICE");
-    T_DjiHalNetworkHandler network_handler;
+    T_DjiHalNetworkHandler network_handler = {0};
     network_handler.NetworkInit = HalNetWork_Init;
     network_handler.NetworkDeInit = HalNetWork_DeInit;
     network_handler.NetworkGetDeviceInfo = HalNetWork_GetDeviceInfo;
@@ -620,15 +624,15 @@ PSDKWrapper::set_user_info(T_DjiUserInfo *user_info)
   strncpy(user_info->appName, params_.app_name.c_str(),
           sizeof(user_info->appName) - 1);
   memcpy(user_info->appId, params_.app_id.c_str(),
-         strlen(params_.app_id.c_str()));
+         USER_UTIL_MIN(sizeof(user_info->appId), strlen(params_.app_id.c_str())));
   memcpy(user_info->appKey, params_.app_key.c_str(),
-         strlen(params_.app_key.c_str()));
+         USER_UTIL_MIN(sizeof(user_info->appKey), strlen(params_.app_key.c_str())));
   memcpy(user_info->appLicense, params_.app_license.c_str(),
-         strlen(params_.app_license.c_str()));
+         USER_UTIL_MIN(sizeof(user_info->appLicense), strlen(params_.app_license.c_str())));
+  memcpy(user_info->baudRate, params_.baudrate.c_str(),
+         USER_UTIL_MIN(sizeof(user_info->baudRate), strlen(params_.baudrate.c_str())));
   strncpy(user_info->developerAccount, params_.developer_account.c_str(),
           sizeof(user_info->developerAccount) - 1);
-  memcpy(user_info->baudRate, params_.baudrate.c_str(),
-         strlen(params_.baudrate.c_str()));
 
   return true;
 }
@@ -642,26 +646,40 @@ PSDKWrapper::init(T_DjiUserInfo *user_info)
     return true;
   }
   RCLCPP_INFO(get_logger(), "Init DJI Core...");
-  int current_num_retries = 0;
+  // int current_num_retries = 0;
   T_DjiReturnCode result;
-  while (current_num_retries <= num_of_initialization_retries_)
-  {
-    result = DjiCore_Init(user_info);
-    if (result != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
-    {
-      RCLCPP_ERROR(get_logger(),
-                   "DJI core could not be initiated. Error code is: %ld. "
-                   "Retrying for %d time. ",
-                   result, current_num_retries);
-      current_num_retries++;
-      std::this_thread::sleep_for(std::chrono::milliseconds(5000));
-      continue;
-    }
-    break;
-  }
+  T_DjiFirmwareVersion firmwareVersion = {
+        .majorVersion = 1,
+        .minorVersion = 0,
+        .modifyVersion = 0,
+        .debugVersion = 0,
+    };
+  // while (current_num_retries <= num_of_initialization_retries_)
+  // {
+  //   result = DjiCore_Init(user_info);
+  //   if (result != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
+  //   {
+  //     RCLCPP_ERROR(get_logger(),
+  //                  "DJI core could not be initiated. Error code is: %ld. "
+  //                  "Retrying for %d time. ",
+  //                  result, current_num_retries);
+  //     current_num_retries++;
+  //     std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+  //     continue;
+  //   }
+  //   break;
+  // }
 
+  // if (result != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
+  // {
+  //   return false;
+  // }
+  result = DjiCore_Init(user_info);
   if (result != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
   {
+    RCLCPP_ERROR(get_logger(),
+                 "DJI core could not be initiated. Error code is: %ld. ",
+                 result);
     return false;
   }
 
@@ -681,6 +699,12 @@ PSDKWrapper::init(T_DjiUserInfo *user_info)
   if (DjiCore_SetAlias("PSDK_App") != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
   {
     RCLCPP_ERROR(get_logger(), "Could not set alias.");
+    return false;
+  }
+
+  if (DjiCore_SetFirmwareVersion(firmwareVersion) != DJI_ERROR_SYSTEM_MODULE_CODE_SUCCESS)
+  {
+    RCLCPP_ERROR(get_logger(), "Could not set firmware version.");
     return false;
   }
 
