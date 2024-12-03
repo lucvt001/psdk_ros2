@@ -8,7 +8,7 @@
       baudrate: "460800"
 
       num_of_initialization_retries: 3
-      is_core_initialized: true
+      is_core_initialized: false
 
       tf_frame_prefix: ""
       imu_frame: "psdk_imu_link"
@@ -27,8 +27,8 @@
       # some modules might have inter-dependencies. Non mandatory modules will
       # still be initialized but if case of failure, the node will continue to run.
       mandatory_modules:
-        telemetry: true
-        flight_control: true
+        telemetry: false
+        flight_control: false
         camera: false
         gimbal: false
         liveview: false
