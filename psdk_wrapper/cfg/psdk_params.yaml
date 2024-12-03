@@ -8,6 +8,7 @@
       baudrate: "460800"
 
       num_of_initialization_retries: 3
+      is_core_initialized: true
 
       tf_frame_prefix: ""
       imu_frame: "psdk_imu_link"

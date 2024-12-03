@@ -91,7 +91,9 @@ PSDKWrapper::PSDKWrapper(const std::string &node_name)
   declare_parameter("data_frequency.control_information", 1);
   declare_parameter("data_frequency.esc_data_frequency", 1);
   declare_parameter("num_of_initialization_retries", 1);
+  declare_parameter("is_core_initialized", false);
 
+  get_parameter("is_core_initialized", is_core_initialized_);
   get_parameter("mandatory_modules.telemetry", is_telemetry_module_mandatory_);
   get_parameter("mandatory_modules.flight_control",
                 is_flight_control_module_mandatory_);
